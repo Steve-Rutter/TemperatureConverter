@@ -1,0 +1,140 @@
+﻿@page "/"
+
+<PageTitle>Temperature Converter</PageTitle>
+
+<h1>Temperature Converter</h1>
+
+Welcome to the Temperature Converter, please input a temperature value, followed by selecting the source temperature type and desired temperature type
+
+<EditForm Model="@temperatureModel" OnSubmit="@TempConversion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <br />
+    <p>
+        <label>
+            Temperature Value:
+            <InputNumber id="Temperature Value" @bind-Value="temperatureModel.TemperatureValue" @onchange="TempConversion"/>
+        </label>
+    </p>
+
+    <p>
+        <label>
+            Source Temperature Type:
+            <InputSelect @bind-Value="temperatureModel.SourceTemperatureType" @onchange="TempConversion">
+                <option value="">Select source type ...</option>
+                <option value="Celsius">Celsius</option>
+                <option value="Fahrenheit">Fahrenheit</option>
+                <option value="Kelvin">Kelvin</option>
+            </InputSelect>
+        </label>
+    </p>    
+    <p>
+        <label>
+            Target Temperature Type:
+            <InputSelect @bind-Value="temperatureModel.TargetTemperatureType" @onchange="TempConversion">
+                <option value="">Select target type ...</option>
+                <option value="Celsius">Celsius</option>
+                <option value="Fahrenheit">Fahrenheit</option>
+                <option value="Kelvin">Kelvin</option>
+            </InputSelect>
+        </label>
+    </p>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@if (isVisible)
+{
+    <h1>The temperature value is @temperatureResult.ToString("0.##") degrees @typeOutput</h1>
+}
+
+@code {
+    private TemperatureModel temperatureModel = new();
+    private bool isVisible = false;
+    private double temperatureResult;
+    private string typeOutput;
+
+    private void TempConversion()
+    {
+        // If Source Temp and Target Temp are the same type, return back the original temp to user
+        if (temperatureModel.SourceTemperatureType == temperatureModel.TargetTemperatureType)
+        {
+            temperatureResult = temperatureModel.TemperatureValue;
+            typeOutput = temperatureModel.TargetTemperatureType;
+            isVisible = true;
+        }
+        // Else do the conversion work based off the two types
+        else
+        {
+            switch (temperatureModel.SourceTemperatureType)
+            {
+                case "Celsius":
+                    {
+                        switch (temperatureModel.TargetTemperatureType)
+                        {
+                            case "Fahrenheit":
+                                {
+                                    temperatureResult = (temperatureModel.TemperatureValue * 1.8) + 32;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+
+                            case "Kelvin":
+                                {
+                                    temperatureResult = temperatureModel.TemperatureValue + 273.15;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+                        }
+                    }
+                    break;
+                case "Fahrenheit":
+                    {
+                      switch (temperatureModel.TargetTemperatureType)
+                        {
+                            case "Celsius":
+                                {
+                                    temperatureResult = (temperatureModel.TemperatureValue - 32) / 1.8;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+
+                            case "Kelvin":
+                                {
+                                    temperatureResult = (temperatureModel.TemperatureValue + 459.67) / 1.8;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+                        }
+                    }
+                    break;
+                case "Kelvin":
+                    {
+                        switch (temperatureModel.TargetTemperatureType)
+                        {
+                            case "Celsius":
+                                {
+                                    temperatureResult = temperatureModel.TemperatureValue - 273.15;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+
+                            case "Fahrenheit":
+                                {
+                                    temperatureResult = (temperatureModel.TemperatureValue * 1.8) - 459.67;
+                                    typeOutput = temperatureModel.TargetTemperatureType;
+                                    isVisible = true;
+                                    break;
+                                }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
